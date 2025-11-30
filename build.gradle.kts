@@ -8,40 +8,51 @@ group = "com.equipxpress"
 version = "0.0.1"
 
 application {
-    mainClass = "io.ktor.server.netty.EngineMain"
+    mainClass.set("com.equipxpress.ApplicationKt")
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
+    // Ktor Server
     implementation("io.ktor:ktor-server-core-jvm:2.3.7")
     implementation("io.ktor:ktor-server-netty-jvm:2.3.7")
-
+    implementation("io.ktor:ktor-server-content-negotiation-jvm:2.3.7")
+    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.3.7")
+    implementation("io.ktor:ktor-server-cors-jvm:2.3.7")
+    implementation("io.ktor:ktor-server-config-yaml:2.3.7")
+    implementation("ch.qos.logback:logback-classic:1.4.11")   
+    
+    // JWT Authentication
+    implementation("io.ktor:ktor-server-auth-jvm:2.3.7")
+    implementation("io.ktor:ktor-server-auth-jwt-jvm:2.3.7")
+    implementation("com.auth0:java-jwt:4.4.0")
+    
     // Koin
     implementation("io.insert-koin:koin-ktor:3.4.3")
-
+    implementation("io.insert-koin:koin-logger-slf4j:3.4.3")
+    
     // Exposed
     implementation("org.jetbrains.exposed:exposed-core:0.44.0")
     implementation("org.jetbrains.exposed:exposed-dao:0.44.0")
     implementation("org.jetbrains.exposed:exposed-jdbc:0.44.0")
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.44.0")
-
-    // PostgreSQL Driver
+    
+    // Database
     implementation("org.postgresql:postgresql:42.7.1")
-
-    implementation(libs.ktor.server.core)
-    implementation(libs.ktor.serialization.kotlinx.json)
-    implementation(libs.ktor.server.content.negotiation)
-    implementation(libs.postgresql)
-    implementation(libs.h2)
-    implementation(libs.exposed.core)
-    implementation(libs.exposed.jdbc)
-    implementation(libs.koin.ktor)
-    implementation(libs.koin.logger.slf4j)
-    implementation(libs.ktor.server.openapi)
-    implementation(libs.ktor.server.conditional.headers)
-    implementation(libs.ktor.server.cors)
-    implementation(libs.ktor.server.netty)
-    implementation(libs.logback.classic)
-    implementation(libs.ktor.server.config.yaml)
-    testImplementation(libs.ktor.server.test.host)
-    testImplementation(libs.kotlin.test.junit)
+    implementation("com.h2database:h2:2.2.224")
+    
+    // BCrypt for password hashing
+    implementation("org.mindrot:jbcrypt:0.4")
+    
+    // Serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    
+    // Logging
+    implementation("ch.qos.logback:logback-classic:1.4.11")
+    implementation("org.jetbrains.exposed:exposed-java-time:0.44.0")
+    // Testing
+    testImplementation("io.ktor:ktor-server-test-host-jvm:2.3.7")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.20")
 }

@@ -1,5 +1,8 @@
 package com.equipxpress.domain.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Item(
     val id: Int? = null,
     val nombre: String,
@@ -7,5 +10,7 @@ data class Item(
     val imagen: String?,
     val categoriaId: Int?,
     val estado: String,
-    val stock: Int
+    val stock: Int,
+    val createdAt: String? = null,
+    val updatedAt: String? = null
 )
