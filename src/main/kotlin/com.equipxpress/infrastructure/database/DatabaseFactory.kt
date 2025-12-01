@@ -7,10 +7,10 @@ object DatabaseFactory {
     
     fun init() {
         // Configuración para PostgreSQL
-        val jdbcURL = "jdbc:postgresql://localhost:5434/equipxpress"
+        val jdbcURL = "jdbc:postgresql://localhost:5432/equipxpress"
         val driverClassName = "org.postgresql.Driver"
         val user = "postgres"
-        val password = "root"  // ← Cambia esto por tu contraseña real
+        val password = "12345"  // ← Cambia esto por tu contraseña real
         
         Database.connect(
             url = jdbcURL,

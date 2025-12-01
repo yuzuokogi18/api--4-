@@ -17,6 +17,8 @@ fun main() {
 fun Application.module() {
     // Configurar base de datos
     DatabaseFactory.init()
+
+    configureCORS()  
     
     // Configurar serialización JSON
     install(ContentNegotiation) {
