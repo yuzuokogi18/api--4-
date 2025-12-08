@@ -20,168 +20,61 @@ fun Route.requestsController(
     deleteRequestUseCase: DeleteRequestUseCase
 ) {
     route("/api/requests") {
+
         post {
-            try {
-                val request = call.receive<Request>()
-                val result = createRequestUseCase(request)
-                
-                result.onSuccess { createdRequest ->
-                    logger.info("Solicitud creada: ID=${createdRequest.id}, userId=${createdRequest.userId}, itemId=${createdRequest.itemId}")
-                    call.respond(HttpStatusCode.Created, createdRequest)
-                }.onFailure { error ->
-                    logger.error("Error al crear solicitud: ${error.message}", error)
-                    call.respond(
-                        HttpStatusCode.BadRequest,
-                        mapOf("error" to (error.message ?: "Error al crear solicitud"))
-                    )
-                }
-            } catch (e: Exception) {
-                logger.error("Excepción al crear solicitud: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    mapOf("error" to "Datos inválidos: ${e.message}")
-                )
+            val req = call.receive<Request>()
+            val result = createRequestUseCase(req)
+
+            result.onSuccess { created ->
+                logger.info("Solicitud creada ID=${created.id}")
+                call.respond(HttpStatusCode.Created, created)
+            }.onFailure {
+                call.respond(HttpStatusCode.BadRequest, mapOf("error" to it.message))
             }
         }
-        
+
         get {
-            try {
-                val result = getAllRequestsUseCase()
-                
-                result.onSuccess { requests ->
-                    logger.debug("Obtenidas ${requests.size} solicitudes")
-                    call.respond(HttpStatusCode.OK, requests)
-                }.onFailure { error ->
-                    logger.error("Error al obtener solicitudes: ${error.message}", error)
-                    call.respond(
-                        HttpStatusCode.InternalServerError,
-                        mapOf("error" to (error.message ?: "Error al obtener solicitudes"))
-                    )
-                }
-            } catch (e: Exception) {
-                logger.error("Excepción al obtener solicitudes: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    mapOf("error" to "Error del servidor: ${e.message}")
-                )
-            }
+            val result = getAllRequestsUseCase()
+            result.onSuccess { call.respond(it) }
+                .onFailure { call.respond(HttpStatusCode.InternalServerError, mapOf("error" to it.message)) }
         }
-        
+
         get("/{id}") {
-            try {
-                val id = call.parameters["id"]?.toIntOrNull()
-                    ?: return@get call.respond(
-                        HttpStatusCode.BadRequest,
-                        mapOf("error" to "ID inválido")
-                    )
-                
-                val result = getRequestByIdUseCase(id)
-                
-                result.onSuccess { request ->
-                    logger.debug("Solicitud encontrada: ID=$id")
-                    call.respond(HttpStatusCode.OK, request)
-                }.onFailure { error ->
-                    logger.warn("Solicitud no encontrada: ID=$id")
-                    call.respond(
-                        HttpStatusCode.NotFound,
-                        mapOf("error" to (error.message ?: "Solicitud no encontrada"))
-                    )
-                }
-            } catch (e: Exception) {
-                logger.error("Excepción al obtener solicitud: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    mapOf("error" to "Error del servidor: ${e.message}")
-                )
-            }
+            val id = call.parameters["id"]?.toIntOrNull()
+                ?: return@get call.respond(HttpStatusCode.BadRequest, mapOf("error" to "ID inválido"))
+
+            val result = getRequestByIdUseCase(id)
+            result.onSuccess { call.respond(it) }
+                .onFailure { call.respond(HttpStatusCode.NotFound, mapOf("error" to it.message)) }
         }
-        
+
         get("/user/{userId}") {
-            try {
-                val userId = call.parameters["userId"]?.toIntOrNull()
-                    ?: return@get call.respond(
-                        HttpStatusCode.BadRequest,
-                        mapOf("error" to "User ID inválido")
-                    )
-                
-                val result = getRequestsUseCase.getByUser(userId)
-                
-                result.onSuccess { requests ->
-                    logger.debug("Obtenidas ${requests.size} solicitudes para userId=$userId")
-                    call.respond(HttpStatusCode.OK, requests)
-                }.onFailure { error ->
-                    logger.error("Error al obtener solicitudes del usuario: ${error.message}", error)
-                    call.respond(
-                        HttpStatusCode.InternalServerError,
-                        mapOf("error" to (error.message ?: "Error al obtener solicitudes"))
-                    )
-                }
-            } catch (e: Exception) {
-                logger.error("Excepción al obtener solicitudes del usuario: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    mapOf("error" to "Error del servidor: ${e.message}")
-                )
-            }
+            val userId = call.parameters["userId"]?.toIntOrNull()
+                ?: return@get call.respond(HttpStatusCode.BadRequest, mapOf("error" to "UserID inválido"))
+
+            val result = getRequestsUseCase.getByUser(userId)
+            result.onSuccess { call.respond(it) }
+                .onFailure { call.respond(HttpStatusCode.InternalServerError, mapOf("error" to it.message)) }
         }
-        
+
         put("/{id}") {
-            try {
-                val id = call.parameters["id"]?.toIntOrNull()
-                    ?: return@put call.respond(
-                        HttpStatusCode.BadRequest,
-                        mapOf("error" to "ID inválido")
-                    )
-                
-                val request = call.receive<Request>()
-                val result = updateRequestUseCase(id, request)
-                
-                result.onSuccess { updatedRequest ->
-                    logger.info("Solicitud actualizada: ID=$id")
-                    call.respond(HttpStatusCode.OK, updatedRequest)
-                }.onFailure { error ->
-                    logger.error("Error al actualizar solicitud: ${error.message}", error)
-                    call.respond(
-                        HttpStatusCode.BadRequest,
-                        mapOf("error" to (error.message ?: "Error al actualizar solicitud"))
-                    )
-                }
-            } catch (e: Exception) {
-                logger.error("Excepción al actualizar solicitud: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    mapOf("error" to "Datos inválidos: ${e.message}")
-                )
-            }
+            val id = call.parameters["id"]?.toIntOrNull()
+                ?: return@put call.respond(HttpStatusCode.BadRequest, mapOf("error" to "ID inválido"))
+
+            val req = call.receive<Request>()
+            val result = updateRequestUseCase(id, req)
+
+            result.onSuccess { call.respond(it) }
+                .onFailure { call.respond(HttpStatusCode.BadRequest, mapOf("error" to it.message)) }
         }
-        
+
         delete("/{id}") {
-            try {
-                val id = call.parameters["id"]?.toIntOrNull()
-                    ?: return@delete call.respond(
-                        HttpStatusCode.BadRequest,
-                        mapOf("error" to "ID inválido")
-                    )
-                
-                val result = deleteRequestUseCase(id)
-                
-                result.onSuccess {
-                    logger.info("Solicitud eliminada: ID=$id")
-                    call.respond(HttpStatusCode.OK, mapOf("message" to "Solicitud eliminada correctamente"))
-                }.onFailure { error ->
-                    logger.warn("Error al eliminar solicitud: ${error.message}")
-                    call.respond(
-                        HttpStatusCode.NotFound,
-                        mapOf("error" to (error.message ?: "Solicitud no encontrada"))
-                    )
-                }
-            } catch (e: Exception) {
-                logger.error("Excepción al eliminar solicitud: ${e.message}", e)
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    mapOf("error" to "Error del servidor: ${e.message}")
-                )
-            }
+            val id = call.parameters["id"]?.toIntOrNull()
+                ?: return@delete call.respond(HttpStatusCode.BadRequest, mapOf("error" to "ID inválido"))
+
+            val result = deleteRequestUseCase(id)
+            result.onSuccess { call.respond(mapOf("message" to "Solicitud eliminada")) }
+                .onFailure { call.respond(HttpStatusCode.NotFound, mapOf("error" to it.message)) }
         }
     }
 }

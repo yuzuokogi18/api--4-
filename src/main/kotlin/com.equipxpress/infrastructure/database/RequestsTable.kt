@@ -11,6 +11,10 @@ object RequestsTable : Table("requests") {
     val estado = varchar("estado", 20)
     val fechaSolicitud = timestamp("fecha_solicitud").default(Instant.now())
     val fechaRespuesta = timestamp("fecha_respuesta").nullable()
-    
+
+    // 👇 Nuevos campos que me pediste agregar
+    val userName = varchar("user_name", 150)
+    val itemName = varchar("item_name", 150)
+
     override val primaryKey = PrimaryKey(id)
 }
