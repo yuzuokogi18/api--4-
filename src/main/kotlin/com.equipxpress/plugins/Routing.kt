@@ -12,9 +12,17 @@ import com.equipxpress.application.usecases.userroles.*
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
+import io.ktor.server.response.*   // <-- IMPORT NECESARIO
+import io.ktor.server.request.*    // <-- IMPORT NECESARIO
+import org.koin.ktor.ext.inject
 
 fun Application.configureRouting() {
     routing {
+
+                get("/") {
+            call.respondText("Servidor funcionando")
+        }
+
         // Users Use Cases
         val createUserUseCase: CreateUserUseCase by inject()
         val loginUserUseCase: LoginUserUseCase by inject()
